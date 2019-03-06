@@ -1,0 +1,128 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Algorythmic Botany</title>
+		<style type="text/css">
+			#theCanvas
+			{
+				margin: auto;
+				border: 5px solid black;
+				display: block;
+			}
+		</style>
+		<script type="text/javascript" src="./processing.js">
+		</script>
+		<script>
+		var clientX = 0;
+		var clientY = 0;
+		var pclientX = 0;
+		var pclientY = 0;
+		var pressedMouse = false;
+
+		function init()
+		{
+			theCanvas = document.getElementById("theCanvas");
+			theCanvas.addEventListener("mousemove", onMouseMove, false);
+			theCanvas.addEventListener("mousedown", onMouseDown, false);
+			theCanvas.addEventListener("mouseup", onMouseUp, false);
+			theCanvas.addEventListener("touchstart", onTouchStart, false);
+			theCanvas.addEventListener("touchmove", onTouchMove, false);
+			theCanvas.addEventListener("touchend", onTouchEnd, false);
+		}
+
+		function hslSetColor(h, s, b)
+		{
+			// Also does conversion from hsb to hsl.
+			let l = (2 - s / 100.0) * b / 2;
+
+			if(l != 0)
+			{
+				if(l == 100.0)
+				{
+					s = 0;
+				}
+				else if(l < 50.0)
+				{
+					s = (s * b) / (l * 2);
+				}
+				else
+				{
+					s = (s * b) / (200.0 - l * 2);
+				}
+			}
+
+			document.body.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+		}
+
+		function getActualPos(x, y)
+		{
+			let rect = theCanvas.getBoundingClientRect();
+			let scaleX = theCanvas.width / rect.width;
+			let scaleY = theCanvas.height / rect.height;
+			return {
+					x: (x - rect.left) * scaleX,
+					y: (y - rect.top * scaleY)
+					}
+		}
+
+		function onMouseMove(event)
+		{
+			event.preventDefault();
+			pclientX = clientX;
+			pclientY = clientY;
+			let pos = getActualPos(event.clientX, event.clientY)
+			clientX = pos.x;
+			clientY = pos.y;
+		}
+
+		function onMouseDown(event)
+		{
+			event.preventDefault();
+			pclientX = clientX;
+			pclientY = clientY;
+			var pos = getActualPos(event.clientX, event.clientY)
+			clientX = pos.x;
+			clientY = pos.y;
+			pressedMouse = true;
+		}
+
+		function onMouseUp(event)
+		{
+			event.preventDefault();
+			pressedMouse = false;
+		}
+
+		function onTouchMove(event)
+		{
+			event.preventDefault();
+			pclientX = clientX;
+			pclientY = clientY;
+			let firstTouch = event.touches[0];
+			let pos = getActualPos(firstTouch.clientX, firstTouch.clientY)
+			clientX = pos.x;
+			clientY = pos.y;
+		}
+
+		function onTouchStart(event)
+		{
+			event.preventDefault();
+			pclientX = clientX;
+			pclientY = clientY;
+			let firstTouch = event.touches[0];
+			let pos = getActualPos(firstTouch.clientX, firstTouch.clientY)
+			clientX = pos.x;
+			clientY = pos.y;
+			pressedMouse = true;
+		}
+
+		function onTouchEnd()
+		{
+			event.preventDefault();
+			pressedMouse = false;
+		}
+		</script>
+	</head>
+	<body onLoad = init()>
+		<canvas id="theCanvas" data-processing-sources="./algorithmicbotany.pde"></canvas>
+	</body>
+</html>
