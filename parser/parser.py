@@ -4,7 +4,7 @@ destination = open("../algorithmicbotany.pde", "w")
 pattern = re.compile(r'public\s+class')
 path = "../source/"
 
-def parse(file, destination):
+def parse(fp, destination):
   with open(path + file, 'r') as f:
     for line in f.readlines():
       if pattern.match(line):
