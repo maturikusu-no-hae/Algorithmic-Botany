@@ -5,7 +5,7 @@ pattern = re.compile(r'public\s+class')
 path = "../source/"
 
 def parse(fp, destination):
-  with open(path + file, 'r') as f:
+  with open(path + fp, 'r') as f:
     for line in f.readlines():
       if pattern.match(line):
         destination.write(re.sub('public', '', line))
