@@ -3,6 +3,16 @@ ArrayList<Tree> trees = new ArrayList<Tree>();
 ArrayList<PhysicsObj> processees = new ArrayList<PhysicsObj>();
 ArrayList<PhysicsObj> renderees = new ArrayList<PhysicsObj>();
 
+float[][] BotanySign ={{53,250}, {57,194}, {60,140}, {98,165}, {110,225}, {176,200}, 
+{217, 196}, {176, 240}, {220, 230}, {300, 190}, {330, 195}, {265, 185},
+{295, 250}, {410, 192}, {390, 220}, {430, 220}, {445, 252}, {375, 255},
+{408, 220}, {500, 252}, {520, 195}, {554, 232}, {575, 175}, {625, 172},
+{658, 195}, {692, 167}, {675, 240}, {295, 215}, {538, 215}, {512, 218},
+{567, 200}, {85, 205}, {55, 217}, {666, 215}, {677, 178}, {642, 182},
+{84, 238}, {58, 164}, {174, 220}, {219, 214}, {196, 197}, {198, 233}};
+
+ArrayList<PhysicsObj> stars = new ArrayList<PhysicsObj>();
+
 float gravity = 2.0;
 float airFriction = 0.001;
 float groundFriction = 0.7;
@@ -51,6 +61,11 @@ void setup()
   sun = new Sun();
   moon = new Moon();
 
+  for(int i = 0;i<BotanySign.length;i++)
+  {
+    new Stars(new PVector(BotanySign[i][0],BotanySign[i][1]),new PVector(random(width),random(120,height/2)));
+  }
+  
   for(int i = 0; i < max_random_drops; i++)
   {
     new Drop(new PVector());
@@ -76,7 +91,15 @@ void draw()
   mousePressed = pressedMouse;
   hslSetColor(background_hue, background_satur, background_light);
   */
-
+  if(mousePressed) {
+    println(pmouseX + " " + pmouseY);
+  }
+  
+  for(int i = 0; i < stars.size(); i++) {
+    PhysicsObj obj = stars.get(i);
+    obj.process();
+    obj.render();
+  }
   sun.drawSelf();
   moon.drawSelf();
 
