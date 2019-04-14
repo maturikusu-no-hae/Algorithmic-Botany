@@ -2,7 +2,7 @@ import os
 import re
 
 destination = open("../algorithmicbotany.pde", "w")
-pattern = re.compile(r'public\s+class')
+pattern = re.compile(r'public.*class')
 path = "../source/"
 
 def parse(fp, destination):
