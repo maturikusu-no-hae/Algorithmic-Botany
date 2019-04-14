@@ -61,9 +61,9 @@ void setup()
   sun = new Sun();
   moon = new Moon();
 
-  for(int i = 0;i<BotanySign.length;i++)
+  for(int i = 0; i < BotanySign.length; i++)
   {
-    new Stars(new PVector(BotanySign[i][0],BotanySign[i][1]),new PVector(random(width),random(120,height/2)));
+    new Stars(new PVector(BotanySign[i][0], BotanySign[i][1]), new PVector(random(width), random(height / 7 ,height / 2)));
   }
   
   for(int i = 0; i < max_random_drops; i++)
@@ -91,11 +91,9 @@ void draw()
   mousePressed = pressedMouse;
   hslSetColor(background_hue, background_satur, background_light);
   */
-  if(mousePressed) {
-    println(pmouseX + " " + pmouseY);
-  }
   
-  for(int i = 0; i < stars.size(); i++) {
+  for(int i = 0; i < stars.size(); i++)
+  {
     PhysicsObj obj = stars.get(i);
     obj.process();
     obj.render();
