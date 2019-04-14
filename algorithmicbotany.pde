@@ -3,7 +3,17 @@ ArrayList<Tree> trees = new ArrayList<Tree>();
 ArrayList<PhysicsObj> processees = new ArrayList<PhysicsObj>();
 ArrayList<PhysicsObj> renderees = new ArrayList<PhysicsObj>();
 
-float gravity = 1.0;
+float[][] BotanySign ={{53,250}, {57,194}, {60,140}, {98,165}, {110,225}, {176,200}, 
+{217, 196}, {176, 240}, {220, 230}, {300, 190}, {330, 195}, {265, 185},
+{295, 250}, {410, 192}, {390, 220}, {430, 220}, {445, 252}, {375, 255},
+{408, 220}, {500, 252}, {520, 195}, {554, 232}, {575, 175}, {625, 172},
+{658, 195}, {692, 167}, {675, 240}, {295, 215}, {538, 215}, {512, 218},
+{567, 200}, {85, 205}, {55, 217}, {666, 215}, {677, 178}, {642, 182},
+{84, 238}, {58, 164}, {174, 220}, {219, 214}, {196, 197}, {198, 233}};
+
+ArrayList<PhysicsObj> stars = new ArrayList<PhysicsObj>();
+
+float gravity = 2.0;
 float airFriction = 0.001;
 float groundFriction = 0.7;
 
@@ -40,7 +50,7 @@ Moon moon;
 void setup()
 {
   size(800, 800);
-  colorMode(HSB, 360, 100, 100, 100);
+  colorMode(HSB, 360.0, 100.0, 100.0, 100.0);
 
   hs1 = new HScrollbar(0, 12, width, 16, 16, true);
   hs2 = new HScrollbar(0, 34, width, 16, 16, true);
@@ -51,6 +61,11 @@ void setup()
   sun = new Sun();
   moon = new Moon();
 
+  for(int i = 0; i < BotanySign.length; i++)
+  {
+    new Stars(new PVector(BotanySign[i][0], BotanySign[i][1]), new PVector(random(width), random(height / 7 ,height / 2)));
+  }
+  
   for(int i = 0; i < max_random_drops; i++)
   {
     new Drop(new PVector());
@@ -68,13 +83,21 @@ void draw()
   background_light = min(82.0, sun.Light + moon.Light);
   background(background_hue, background_satur, background_light);
 
+  
   pmouseX = pclientX;
   pmouseY = pclientY;
   mouseX = clientX;
   mouseY = clientY;
   mousePressed = pressedMouse;
   hslSetColor(background_hue, background_satur, background_light);
-
+  
+  
+  for(int i = 0; i < stars.size(); i++)
+  {
+    PhysicsObj obj = stars.get(i);
+    obj.process();
+    obj.render();
+  }
   sun.drawSelf();
   moon.drawSelf();
 
@@ -198,7 +221,6 @@ class HScrollbar {
     return spos * ratio;
   }
 }
-
 class Branch extends PhysicsObj
 {
   PVector start;
@@ -334,7 +356,6 @@ class Branch extends PhysicsObj
     line(start.x, start.y, end.x, end.y);
   }
 }
-
 class Drop extends PhysicsObj
 {
   color Color = color(210.0, 100.0, 100.0, 50.0);
@@ -419,7 +440,6 @@ class Drop extends PhysicsObj
     }
   }
 }
-
 class Leaf extends PhysicsObj
 { 
   boolean falling = false;
@@ -506,7 +526,6 @@ class Leaf extends PhysicsObj
     processees.add(this);
   }
 }
-
 class Moon
 {
   float X = width / 2;
@@ -577,7 +596,6 @@ class Moon
     ellipse(this.X, this.Y, this.Size, this.Size);
   }
 }
-
 class PhysicsObj
 {
   // The current position of this very object.
@@ -651,7 +669,75 @@ class PhysicsObj
   {
   }
 }
+class Stars extends PhysicsObj
+{  
+  PVector target = new PVector();
+  PVector startPos;
+  float kX;
+  float kY;
+  float Size;
+  float visibleSize = 2;
 
+  float hue = 0.0;
+  
+  public Stars(PVector dest, PVector start)
+  {
+    super(start);
+    this.startPos = start;
+    this.Size = random(1.5, 6);
+    this.target = dest.copy();
+    this.hue = random(0.0, 360.0);
+
+    if(this.target.x != this.pos.x)
+    {
+      this.kX = Math.signum(this.target.x - this.pos.x);
+    }
+    if(this.target.y != pos.y)
+    {
+      this.kY = Math.signum(this.target.y - this.pos.y);
+    }
+    
+    stars.add(this);
+  }
+
+  public void drawSelf() 
+  {
+    if(sun.Light < this.Size * 3.3)
+    {
+      stroke(this.Color);
+      fill(this.Color);
+      ellipse(this.pos.x, this.pos.y, this.visibleSize, this.visibleSize);
+    }
+  }
+
+  public void applySpeed() 
+  {
+    this.SpeedX += this.AccX * dt;
+    this.SpeedY += this.AccY * dt;
+    
+    if(this.pos.x * this.kX < this.target.x * this.kX)
+    {
+      this.pos.x += this.kX * this.SpeedX;
+    }
+
+    if(this.pos.y * this.kY < this.target.y * this.kY)
+    {
+      this.pos.y += this.kY * this.SpeedY;
+    }
+  }
+
+  public void setColor() 
+  {
+    this.visibleSize = map(sun.Light, 0, this.Size * 3.3, this.Size, 1) + random(-this.Size / 5, this.Size / 5);
+    this.Color = color(this.hue, 5, map(sun.Light, 100.0, 0.0, 178.5, 255.0));
+  }
+
+  public void setAcceleration()
+  {
+    this.AccX = map(this.pos.x, startPos.x, target.x, (0.01 / this.Size), (0.05 / this.Size));
+    this.AccY = map(this.pos.y, startPos.y, target.y, (0.01 / this.Size), (0.05 / this.Size));
+  }
+}
 class Sun
 {
   float X = width / 2;
@@ -709,7 +795,6 @@ class Sun
     ellipse(this.X, this.Y, this.Size, this.Size);
   }
 }
-
 class Tree
 {
   ArrayList<Branch> branches = new ArrayList<Branch>();
