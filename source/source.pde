@@ -36,6 +36,8 @@ float background_hue = 0.0;
 float background_satur = 0.0;
 float background_light = 0.0;
 
+float skyHue = 190;
+
 HScrollbar hs1;
 HScrollbar hs2;
 HScrollbar hs3;
@@ -78,9 +80,14 @@ void setup()
 
 void draw()
 {
+  background_hue = (skyHue + map(sun.Light, 0.0, 100.0, 170.0, 0.0)) % 360;
+  background_satur = min(30.0, sun.Light);
+  background_light = min(75.0, map(sun.Light + moon.Light, 0.0, 100.0, 5.0, 70.0));
+  /*
   background_hue = min(210.0, map(sun.hue, 30.0, 50.0, sun.hue, 210.0));
   background_satur = min(50.0, sun.Light);
   background_light = min(82.0, sun.Light + moon.Light);
+  */
   background(background_hue, background_satur, background_light);
 
   /*~
