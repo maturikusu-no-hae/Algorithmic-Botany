@@ -1,0 +1,57 @@
+body
+{
+  margin: 0px;
+  padding: 0px;
+  font-family: Courier;
+}
+
+div
+{
+  height: 300px;
+  width: 300px;
+  background-color: red;
+}
+
+header
+{
+  height: 150px;
+  width: 100%;
+  background-color: green;
+  margin: 0px;
+  padding: 0px;
+
+}
+
+p
+{
+  margin: 0px;
+  padding: 0px;
+  color: yellow;
+}
+
+.link
+{
+  margin-left: 50%;
+  margin-top: 20px;
+}
+
+a
+{
+  color: yellow;
+  text-decoration: none;
+  font-size: 40px;
+}
+
+#theCanvas
+{
+  margin: auto;
+  border: 5px solid black;
+  display: block;
+}
+
+#L-system
+{
+	margin: auto;
+	border: 5px solid black;
+	display: block;
+}

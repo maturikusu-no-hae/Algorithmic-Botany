@@ -3,7 +3,7 @@
 	<head>
 		<link rel="stylesheet" href="css.css">
 		<meta charset="UTF-8">
-		<title>Algorythmic Botany</title>
+		<title>L-System Tree</title>
 		<script type="text/javascript" src="./processing.js"></script>
 		<script>
 		var clientX = 0;
@@ -14,7 +14,7 @@
 
 		function init()
 		{
-			theCanvas = document.getElementById("theCanvas");
+			theCanvas = document.getElementById("L-system");
 			theCanvas.addEventListener("mousemove", onMouseMove, false);
 			theCanvas.addEventListener("mousedown", onMouseDown, false);
 			theCanvas.addEventListener("mouseup", onMouseUp, false);
@@ -120,6 +120,6 @@
 		<p><a class="link" href="l-system.html">L-system</a></p>
 	</header>
 	<body onLoad = init()>
-		<canvas id="theCanvas" data-processing-sources="./algorithmicbotany.pde"></canvas>
+		<canvas id="L-system" data-processing-sources="./l-system.pde"></canvas>
 	</body>
 </html>
