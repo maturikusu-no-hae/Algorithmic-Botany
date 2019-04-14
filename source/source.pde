@@ -83,14 +83,14 @@ void draw()
   background_light = min(82.0, sun.Light + moon.Light);
   background(background_hue, background_satur, background_light);
 
-  /*
+  /*~
   pmouseX = pclientX;
   pmouseY = pclientY;
   mouseX = clientX;
   mouseY = clientY;
   mousePressed = pressedMouse;
   hslSetColor(background_hue, background_satur, background_light);
-  */
+  ~*/
   
   for(int i = 0; i < stars.size(); i++)
   {
