@@ -19,11 +19,11 @@ public class Stars extends PhysicsObj
 
     if(this.target.x != this.pos.x)
     {
-      this.kX = Math.signum(this.target.x - this.pos.x);
+      this.kX = Compatibility_Functions.signum(this.target.x - this.pos.x);
     }
     if(this.target.y != pos.y)
     {
-      this.kY = Math.signum(this.target.y - this.pos.y);
+      this.kY = Compatibility_Functions.signum(this.target.y - this.pos.y);
     }
     
     stars.add(this);
