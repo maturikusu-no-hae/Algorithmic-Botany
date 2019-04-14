@@ -685,7 +685,7 @@ class Stars extends PhysicsObj
     super(start);
     this.startPos = start;
     this.Size = random(1.5, 6);
-    this.target = dest.copy();
+    this.target = dest;
     this.hue = random(0.0, 360.0);
 
     if(this.target.x != this.pos.x)
