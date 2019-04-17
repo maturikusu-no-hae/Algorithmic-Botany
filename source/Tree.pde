@@ -9,9 +9,9 @@ public class Tree
 
   int grown_times = 0;
 
-  public Tree(float x, float y)
+  public Tree(float x, float y, float z)
   {
-    this.root = new Branch(new PVector(x, y), new PVector(x, y - map(hs1.getPos(), 1.0, width, 1.0, 200.0)));
+    this.root = new Branch(new PVector(x, y, z), new PVector(x, y - map(hs1.getPos(), 1.0, width, 1.0, 200.0), z));
     this.root.source = this;
     this.branches.add(root);
     this.growing_branches.add(root);

@@ -6,9 +6,11 @@ public class PhysicsObj
   // These variables are related to how the object moves. They should be private or restricted really.
   public float SpeedX = 0.0;
   public float SpeedY = 0.0;
+  public float SpeedZ = 0.0;
 
   public float AccX = 0.0;
   public float AccY = 0.0;
+  public float AccZ = 0.0;
 
   // The very color of our object. It's placed here so we can easily dynamically change it based on lightning.
   public color Color;
@@ -44,6 +46,7 @@ public class PhysicsObj
   {
     this.AccX = 0.0;
     this.AccY = 0.0;
+    this.AccZ = 0.0;
   }
 
   // This function should be overwritten only when special features are added, such as falling off leaves, or such.
@@ -51,9 +54,11 @@ public class PhysicsObj
   {
     this.SpeedX += this.AccX * dt;
     this.SpeedY += this.AccY * dt;
+    this.SpeedZ += this.AccZ * dt;
 
     this.pos.x += this.SpeedX * dt;
     this.pos.y += this.SpeedY * dt;
+    this.pos.z += this.SpeedZ * dt;
   }
 
   // This function should have contents of helping our object staying in canvas. If ever required.

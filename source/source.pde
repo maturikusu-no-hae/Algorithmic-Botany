@@ -1,3 +1,5 @@
+import peasy.*;
+
 ArrayList<Tree> trees = new ArrayList<Tree>();
 
 ArrayList<PhysicsObj> processees = new ArrayList<PhysicsObj>();
@@ -22,6 +24,7 @@ float mouse_acc_y = 0.05;
 
 float wind_acc_x = 0.0;
 float wind_acc_y = 0.0;
+float wind_acc_z = 10.0;
 
 int max_grown_times = 10; // Default: 10.
 int min_grown_length = 8; // Default: 8.
@@ -49,10 +52,14 @@ Tree tree;
 Sun sun;
 Moon moon;
 
+PeasyCam cam;
+
 void setup()
 {
-  size(800, 800);
+  size(800, 800, P3D);
   colorMode(HSB, 360.0, 100.0, 100.0, 100.0);
+
+  cam = new PeasyCam(this, 800);
 
   hs1 = new HScrollbar(0, 12, width, 16, 16, true);
   hs2 = new HScrollbar(0, 34, width, 16, 16, true);
@@ -74,12 +81,13 @@ void setup()
   }
 
   colorMode(HSB);
-  tree = new Tree(width / 2, height);
+  tree = new Tree(width / 2, height, 0);
   //trees.add(new Tree(width / 2, height));
 }
 
 void draw()
 {
+  translate(- width / 2, - height / 2, 100);
   background_hue = (skyHue + map(sun.Light, 0.0, 100.0, 170.0, 0.0)) % 360;
   background_satur = min(30.0, sun.Light);
   background_light = min(75.0, map(sun.Light + moon.Light, 0.0, 100.0, 5.0, 70.0));
@@ -89,6 +97,14 @@ void draw()
   background_light = min(82.0, sun.Light + moon.Light);
   */
   background(background_hue, background_satur, background_light);
+
+  push();
+  translate(0.0, height);
+  rotateX(PI / 2);
+  noStroke();
+  fill(background_hue, background_satur, max(0.0, background_light - 15.0));
+  rect(-width * 2, -height * 2, width * 5, height * 3);
+  pop();
 
   /*~
   pmouseX = pclientX;
@@ -192,7 +208,7 @@ class HScrollbar {
       if(this.update)
       {
         tree.Del();
-        tree = new Tree(width / 2, height);
+        tree = new Tree(width / 2, height, 0);
       }
     }
   }
