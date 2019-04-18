@@ -1,13 +1,18 @@
 import os
 import re
+import sys
 
-destination = open("../algorithmicbotany.pde", "w")
+path = "../"
+if len(sys.argv) > 1:
+    path = sys.argv[1]
+
+destination = open(path + "algorithmicbotany.pde", "w")
 pattern = re.compile(r'public.*class')
-path = "../source/"
+path += "source/"
 
 
 def parse(fp, destination):
-    with open(path + fp, 'r') as f:
+    with open(fp, 'r') as f:
         for line in f.readlines():
             if pattern.match(line):
                 destination.write(re.sub('public ', '', line))
@@ -39,7 +44,7 @@ def parse(fp, destination):
             destination.write(line)
 
 
-parse('../source/source.pde', destination)
+parse(path + "source.pde", destination)
 
 for root, dirs, files in os.walk(path):
     for fp in files:

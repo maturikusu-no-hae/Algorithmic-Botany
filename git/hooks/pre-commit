@@ -1,0 +1,3 @@
+#!/bin/sh
+
+python parser/parser.py "./"
