@@ -367,7 +367,12 @@ static class Compatibility_Functions
 {
   public static float signum(float f)
   {
-    return abs(f) / f;
+    
+    return Math.sign(f);
+    
+    /*
+    return Math.signum(f);
+    */
   }
 
   public static boolean isNaN(float f)
