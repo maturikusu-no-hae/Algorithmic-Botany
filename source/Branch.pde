@@ -83,9 +83,12 @@ public class Branch extends PhysicsObj
   {
     float x_offset_acc = (this.default_end.x - this.end.x) * this.friction * this.default_len;
     float y_offset_acc = (this.default_end.y - this.end.y) * this.friction * this.default_len;
+    float z_offset_acc = (this.default_end.z - this.end.z) * this.friction * this.default_len;
 
     this.AccX = wind_acc_x - this.SpeedX * (this.friction + airFriction) * this.default_len + x_offset_acc;
     this.AccY = wind_acc_y + gravity - this.SpeedY * (this.friction + airFriction) * this.default_len + y_offset_acc;
+    this.AccZ = wind_acc_z - this.SpeedZ * (this.friction + airFriction) * this.default_len + z_offset_acc;
+
     if(mousePressed)
     {
       float x_offset = this.end.x - mouseX;
@@ -100,8 +103,9 @@ public class Branch extends PhysicsObj
   {
     this.SpeedX += this.AccX * dt / this.default_len;
     this.SpeedY += this.AccY * dt / this.default_len;
+    this.SpeedZ += this.AccZ * dt / this.default_len;
 
-    if(abs(this.SpeedX) > 10 || abs(this.SpeedY) > 10)
+    if(abs(this.SpeedX) > 10 || abs(this.SpeedY) > 10 || abs(this.SpeedZ) > 10)
     {
       for(int i = this.my_leaves.size() - 1; i >= 0; i--)
       {
@@ -113,7 +117,7 @@ public class Branch extends PhysicsObj
     }
 
     PVector b_old_vector = PVector.sub(this.end, this.start);
-    PVector b_speed = new PVector(this.SpeedX * dt, this.SpeedY * dt);
+    PVector b_speed = new PVector(this.SpeedX * dt, this.SpeedY * dt, this.SpeedZ * dt);
     PVector b_end_speed = PVector.add(b_speed, this.end);
 
     PVector b_false_vector = PVector.sub(b_end_speed, this.start);
@@ -130,6 +134,6 @@ public class Branch extends PhysicsObj
   public void drawSelf()
   {
     stroke(this.Color);
-    line(start.x, start.y, end.x, end.y);
+    line(start.x, start.y, start.z, end.x, end.y, end.z);
   }
 }

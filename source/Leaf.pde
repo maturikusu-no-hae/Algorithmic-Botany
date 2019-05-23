@@ -14,8 +14,9 @@ public class Leaf extends PhysicsObj
   {
     if(falling)
     {
-      this.AccX = -this.SpeedX * airFriction * PI * pow(this.Size / 2, 2) + wind_acc_x;
+      this.AccX = - this.SpeedX * airFriction * PI * pow(this.Size / 2, 2) + wind_acc_x;
       this.AccY = gravity - this.SpeedY * airFriction * PI * pow(this.Size / 2, 2) + wind_acc_y;
+      this.AccZ = - this.SpeedZ * airFriction * PI * pow(this.Size / 2, 2) + wind_acc_z;
 
       if(mousePressed)
       {
@@ -32,9 +33,11 @@ public class Leaf extends PhysicsObj
   {
     this.SpeedX += this.AccX * dt / (PI * pow(this.Size / 2, 2));
     this.SpeedY += this.AccY * dt / (PI * pow(this.Size / 2, 2));
+    this.SpeedZ += this.AccZ * dt / (PI * pow(this.Size / 2, 2));
 
     this.pos.x += this.SpeedX * dt;
     this.pos.y += this.SpeedY * dt;
+    this.pos.z += this.SpeedZ * dt;
   }
 
   public void stayInCanvas()
@@ -56,6 +59,11 @@ public class Leaf extends PhysicsObj
       processees.remove(this);
       renderees.remove(this);
     }
+    if((this.pos.z - this.Size / 2) < 0.0 || (this.pos.z + this.Size / 2) > width)
+    {
+      processees.remove(this);
+      renderees.remove(this);
+    }
   }
 
   public void setColor()
@@ -67,7 +75,11 @@ public class Leaf extends PhysicsObj
   {
     stroke(this.Color);
     fill(this.Color);
-    ellipse(this.pos.x, this.pos.y, this.Size, this.Size);
+    push();
+    translate(this.pos.x, this.pos.y, this.pos.z);
+    sphere(this.Size / 2);
+    pop();
+    // ellipse(this.pos.x, this.pos.y, this.pos.z, this.Size, this.Size);
 
     if(!falling && dist(this.pos.x, this.pos.y, mouseX, mouseY) < (this.Size / 2) + 2)
     {

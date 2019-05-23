@@ -2,6 +2,7 @@ public class Moon
 {
   float X = width / 2;
   float Y = height * 1.5;
+  float Z = -70.0;
 
   float Light = 0.0;
   float Size = 100.0;
@@ -65,6 +66,10 @@ public class Moon
 
     stroke(this.hue, this.satur, this.bright);
     fill(this.hue, this.satur, this.bright);
-    ellipse(this.X, this.Y, this.Size, this.Size);
+    push();
+    translate(this.X, this.Y, this.Z);
+    sphere(this.Size / 2);
+    pop();
+    // ellipse(this.X, this.Y, this.Size, this.Size);
   }
 }
