@@ -1,0 +1,64 @@
+@media only screen and (max-width: 967px) {
+#Form{
+	position: absolute;
+	bottom: 2%;
+	top: 70%;
+}
+#logo{
+	padding:0;
+}
+input[type=checkbox]{
+	position:absolute;
+	top:-7777px;
+	left:-7777px;
+	background:none
+}
+input[type=checkbox]:focus{
+	background:none;
+}
+label{
+	float:right;
+	display:inline-block;
+	cursor:pointer;
+	margin-right:25px;
+}
+input[type=checkbox]:checked ~ nav{
+	display:block;
+}
+nav{
+	display:none;
+	position:absolute;
+	right:0;
+	top:64px;
+	background-color:#002e5b;
+	padding:0;
+	z-index:99;
+}
+nav ul{
+	width:auto;
+}
+nav ul li{
+	float:none;
+	padding:0;
+	width:100%;
+	display:table;
+}
+nav ul li a{
+	color:#FFF;
+	font-size:15px;
+	padding:10px 20px;
+	display:block;
+	border-bottom:1px solid rgba(225,225,225,0.1);
+}
+}
+@media only screen and (max-width: 360px) {
+label{
+	padding:5px 0;
+}
+#logo{
+	font-size:1.1rem;
+}
+nav{
+	top:47px;
+}
+}

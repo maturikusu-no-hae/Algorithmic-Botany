@@ -1,125 +1,324 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 	<head>
-		<link rel="stylesheet" href="css.css">
-		<meta charset="UTF-8">
-		<title>L-System Tree</title>
-		<script type="text/javascript" src="./processing.js"></script>
+		<meta charset="utf-8">
+		<title>Algorythmic Botany</title>
+		<link href="style.css" rel="stylesheet">
+		<link href="media.css" rel="stylesheet">
+		<script type="text/javascript" src="processing.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
+		<!-- Tooltip vars for localisation purposes. -->
 		<script>
-		var clientX = 0;
-		var clientY = 0;
-		var pclientX = 0;
-		var pclientY = 0;
-		var pressedMouse = false;
+			var FIELD_A_TIP = "A: Put a single letter here, which will be translated into B.";
+			var FIELD_B_TIP = "B: Put a string here, A will be translated into it.";
+			var FIELD_PROB_TIP = "Prob: Put a number 0-100 here, it's the probability of this translation.";
+			var SLIDER_LENGTH_TIP = "This slider regulates length of each branch."
+			var SLIDER_ANGLE_TIP = "This slider regulates angle at which new branches grow."
+			var SLIDER_ITERATIONS_TIP = "This slider regulates how many iterations will be made."
+			var SLIDER_4_TIP = "This slider is useless. Much like this website is."
 
-		function init()
-		{
-			theCanvas = document.getElementById("L-system");
-			theCanvas.addEventListener("mousemove", onMouseMove, false);
-			theCanvas.addEventListener("mousedown", onMouseDown, false);
-			theCanvas.addEventListener("mouseup", onMouseUp, false);
-			theCanvas.addEventListener("touchstart", onTouchStart, false);
-			theCanvas.addEventListener("touchmove", onTouchMove, false);
-			theCanvas.addEventListener("touchend", onTouchEnd, false);
-		}
+			var FIELD_IDS = [];
+			var LAST_FIELDS_ID = 0;
+		</script>
 
-		function hslSetColor(h, s, b)
-		{
-			// Also does conversion from hsb to hsl.
-			let l = (2 - s / 100.0) * b / 2;
-
-			if(l != 0)
+		<!-- Rule fields generation -->
+		<script>
+			function add_rule(A="X", B="F", Prob=0)
 			{
-				if(l == 100.0)
+			    $('.inputs').append(`<div>
+			    	                 <p>
+			    	                 <div class="tooltip">
+			    	                 <input maxlength="1" id="inputField${LAST_FIELDS_ID}"></br>
+			    	                 <span class="tooltiptext">${FIELD_A_TIP}</span>
+			    	                 </div>
+			    	                 <div class="tooltip">
+			    	                 <input id="inputField${LAST_FIELDS_ID + 1}"></br>
+			    	                 <span class="tooltiptext">${FIELD_B_TIP}</span>
+			    	                 </div>
+			    	                 <div class="tooltip">
+			    	                 <input type="number" maxlength="3" id="inputField${LAST_FIELDS_ID + 2}"></br>
+			    	                 <span class="tooltiptext">${FIELD_PROB_TIP}</span>
+			    	                 </div>
+			    	                 <input type="button" value="Delete" id="inputDelete${LAST_FIELDS_ID}" onclick="removeDiv(this);">
+			    	                 </p>
+			    	                 </div>`
+			    );
+
+			    document.getElementById("inputField" + LAST_FIELDS_ID).value = A;
+			    document.getElementById("inputField" + (LAST_FIELDS_ID + 1)).value = B;
+			    document.getElementById("inputField" + (LAST_FIELDS_ID + 2)).value = Prob;
+
+			    FIELD_IDS.push(LAST_FIELDS_ID, LAST_FIELDS_ID + 1, LAST_FIELDS_ID + 2);
+			    LAST_FIELDS_ID += 3;
+
+				$("ul").on("click", "button", function(e)
+					{
+				    	e.preventDefault();
+						$(this).parent().remove();
+					}
+				);
+			}
+
+			function add_input()
+			{
+				add_rule();
+			}
+		</script>
+
+		<!-- Array for use inside Processing app. -->
+		<script>
+			var saved_array = [];
+			
+			function save()
+			{
+				saved_array = [];
+
+				for(i = 0; i < FIELD_IDS.length; i++)
 				{
-					s = 0;
+					var get_id = FIELD_IDS[i];
+					saved_array[i] = document.getElementById("inputField" + get_id).value;
 				}
-				else if(l < 50.0)
+
+				newRules = true;
+				updateTree = true;
+			}
+		</script>
+
+		<!-- Removing buttons. -->
+		<script>
+			function removeFromArray(original, remove)
+			{
+  				for(i = 0; i < remove.length; i++)
+  				{
+  					var ind = original.indexOf(remove[i]);
+  					if(ind > -1)
+  					{
+  						original.splice(ind, 1);
+  					}
+  				}
+			}
+
+			function removeDiv(that)
+			{
+			    var div = that.parentNode;
+			    var start_id = parseInt(that.id.slice(11), 10); // 11 is the length of "inputDelete", so we splice it from it's end to the end of string to get the number.
+			    removeFromArray(FIELD_IDS, [start_id, start_id + 1, start_id + 2])
+			    div.parentNode.removeChild(div);
+			}
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="http://css3-mediaqueries-js.googlecode.com/files/css3-mediaqueries.js"></script>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		![endif]-->
+
+		<script>
+			var clientX = 0;
+			var clientY = 0;
+			var pclientX = 0;
+			var pclientY = 0;
+			var pressedMouse = false;
+			var updateTree = false;
+			var newRules = false;
+
+			var STARTING_RULES = [];
+
+			function init()
+			{
+				theCanvas = document.getElementById("theCanvas");
+				theCanvas.addEventListener("mousemove", onMouseMove, false);
+				theCanvas.addEventListener("mousedown", onMouseDown, false);
+				theCanvas.addEventListener("mouseup", onMouseUp, false);
+				theCanvas.addEventListener("touchstart", onTouchStart, false);
+				theCanvas.addEventListener("touchmove", onTouchMove, false);
+				theCanvas.addEventListener("touchend", onTouchEnd, false);
+
+				document.getElementById("myRange1Tip").innerHTML = SLIDER_LENGTH_TIP;
+				document.getElementById("myRange2Tip").innerHTML = SLIDER_ANGLE_TIP;
+				document.getElementById("myRange3Tip").innerHTML = SLIDER_ITERATIONS_TIP;			}
+
+			function setRules(newRules)
+			{
+				STARTING_RULES = newRules;
+
+				for(i = 0; i < STARTING_RULES.length; i++)
 				{
-					s = (s * b) / (l * 2);
-				}
-				else
-				{
-					s = (s * b) / (200.0 - l * 2);
+					let rule = STARTING_RULES[i];
+					add_rule(rule.A, rule.B, rule.probability);
 				}
 			}
 
-			document.body.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
-		}
+			function debug(message)
+			{
+				console.log(message);
+			}
 
-		function getActualPos(x, y)
-		{
-			let rect = theCanvas.getBoundingClientRect();
-			let scaleX = theCanvas.width / rect.width;
-			let scaleY = theCanvas.height / rect.height;
-			return {
-					x: (x - rect.left) * scaleX,
-					y: (y - rect.top * scaleY)
+			function update_tree()
+			{
+				updateTree = true;
+			}
+
+			function getSliderValue(slider_id)
+			{
+				return document.getElementById(slider_id).value;
+			}
+
+			function hslSetColor(h, s, b)
+			{
+				// Also does conversion from hsb to hsl.
+				let l = (2 - s / 100.0) * b / 2;
+				if(l != 0)
+				{
+					if(l == 100.0)
+					{
+						s = 0;
 					}
-		}
+					else if(l < 50.0)
+					{
+						s = (s * b) / (l * 2);
+					}
+					else
+					{
+						s = (s * b) / (200.0 - l * 2);
+					}
+				}
+				document.body.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+			}
 
-		function onMouseMove(event)
-		{
-			event.preventDefault();
-			pclientX = clientX;
-			pclientY = clientY;
-			let pos = getActualPos(event.clientX, event.clientY)
-			clientX = pos.x;
-			clientY = pos.y;
-		}
+			function getActualPos(x, y)
+			{
+				let rect = theCanvas.getBoundingClientRect();
+				let scaleX = theCanvas.width / rect.width;
+				let scaleY = theCanvas.height / rect.height;
+				return {
+						x: (x - rect.left) * scaleX,
+						y: (y - rect.top * scaleY)
+						}
+			}
 
-		function onMouseDown(event)
-		{
-			event.preventDefault();
-			pclientX = clientX;
-			pclientY = clientY;
-			var pos = getActualPos(event.clientX, event.clientY)
-			clientX = pos.x;
-			clientY = pos.y;
-			pressedMouse = true;
-		}
+			function onMouseMove(event)
+			{
+				event.preventDefault();
+				pclientX = clientX;
+				pclientY = clientY;
+				let pos = getActualPos(event.clientX, event.clientY)
+				clientX = pos.x;
+				clientY = pos.y;
+			}
 
-		function onMouseUp(event)
-		{
-			event.preventDefault();
-			pressedMouse = false;
-		}
+			function onMouseDown(event)
+			{
+				event.preventDefault();
+				pclientX = clientX;
+				pclientY = clientY;
+				var pos = getActualPos(event.clientX, event.clientY)
+				clientX = pos.x;
+				clientY = pos.y;
+				pressedMouse = true;
+			}
 
-		function onTouchMove(event)
-		{
-			event.preventDefault();
-			pclientX = clientX;
-			pclientY = clientY;
-			let firstTouch = event.touches[0];
-			let pos = getActualPos(firstTouch.clientX, firstTouch.clientY)
-			clientX = pos.x;
-			clientY = pos.y;
-		}
+			function onMouseUp(event)
+			{
+				event.preventDefault();
+				pressedMouse = false;
+			}
 
-		function onTouchStart(event)
-		{
-			event.preventDefault();
-			pclientX = clientX;
-			pclientY = clientY;
-			let firstTouch = event.touches[0];
-			let pos = getActualPos(firstTouch.clientX, firstTouch.clientY)
-			clientX = pos.x;
-			clientY = pos.y;
-			pressedMouse = true;
-		}
+			function onTouchMove(event)
+			{
+				event.preventDefault();
+				pclientX = clientX;
+				pclientY = clientY;
+				let firstTouch = event.touches[0];
+				let pos = getActualPos(firstTouch.clientX, firstTouch.clientY)
+				clientX = pos.x;
+				clientY = pos.y;
+			}
 
-		function onTouchEnd()
-		{
-			event.preventDefault();
-			pressedMouse = false;
-		}
+			function onTouchStart(event)
+			{
+				event.preventDefault();
+				pclientX = clientX;
+				pclientY = clientY;
+				let firstTouch = event.touches[0];
+				let pos = getActualPos(firstTouch.clientX, firstTouch.clientY)
+				clientX = pos.x;
+				clientY = pos.y;
+				pressedMouse = true;
+			}
+
+			function onTouchEnd()
+			{
+				event.preventDefault();
+				pressedMouse = false;
+			}
+		</script>
+
+		<!-- Hiding the rules. -->
+		<script>
+			$(document).ready(function()
+				{
+					$("#showHideContent").click(function()
+						{
+							if($(".inputs").is(":hidden"))
+							{
+								$(".inputs").show("slow");
+							}
+							else
+							{
+								$(".inputs").hide("slow");
+							}
+							return false;
+						}
+					);
+				}
+			);
 		</script>
 	</head>
-	<header>
-		<p><a class="link" href="index.html">Home</a></p>
-		<p><a class="link" href="l-system.html">L-system</a></p>
-	</header>
 	<body onLoad = init()>
-		<canvas id="L-system" data-processing-sources="./l-system.pde"></canvas>
+		<header>
+			<div class="container">
+				<a href="#" id="logo" target="_blank"><img height="60px" src="logo.png"></a>
+				<label for="toggle-1" class="toggle-menu">
+	          		<ul>
+			            <li></li>
+			            <li></li>
+			            <li></li>
+			        </ul>
+		        </label>
+				<input type="checkbox" id="toggle-1">
+				<nav>
+					<ul>
+						<li><a class="link" href="index.html">Home</a></li>
+						<li><a class="link" href="l-system.html">L-system</a></li>
+						<li><a href="#">About</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+
+		<div class="slidecontainer">
+			<div class="tooltip">
+				<input type="range" min="1" max="100" value="50" class="slider" id="myRange1" oninput="update_tree()"> </br>
+				<span class="tooltiptext" id="myRange1Tip">Tooltip text</span>
+			</div>
+			<div class="tooltip">
+				<input type="range" min="1" max="100" value="50" class="slider" id="myRange2" oninput="update_tree()"> </br>
+				<span class="tooltiptext" id="myRange2Tip">Tooltip text</span>
+			</div>
+			<div class="tooltip">
+				<input type="range" min="1" max="100" value="50" class="slider" id="myRange3" oninput="update_tree()"> </br>
+				<span class="tooltiptext" id="myRange3Tip">Tooltip text</span>
+			</div>
+		</div>
+		<form id="Form">
+			<div class="inputs"></div>
+			<input type="button" onclick="add_input()" value="Add" />
+			<input type="button" value="Submit" onclick="save()"></input> </br>
+			<button id="showHideContent">Show/Hide</button>
+		</form>
+		<canvas id="theCanvas" data-processing-sources="./l-system.pde"></canvas>
+
+		<footer>
+    	</footer>
 	</body>
 </html>

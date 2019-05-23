@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<link rel="stylesheet" href="css.css">
 		<meta charset="UTF-8">
 		<title>Algorythmic Botany</title>
+		<link href="style.css" rel="stylesheet">
+		<link href="media.css" rel="stylesheet">
 		<script type="text/javascript" src="./processing.js"></script>
+
 		<script>
 		var clientX = 0;
 		var clientY = 0;
@@ -114,12 +116,32 @@
 			pressedMouse = false;
 		}
 		</script>
+
 	</head>
-	<header>
-		<p><a class="link" href="index.html">Home</a></p>
-		<p><a class="link" href="l-system.html">L-system</a></p>
-	</header>
+
 	<body onLoad = init()>
+		<header>
+			<div class="container">
+				<a href="#" id="logo" target="_blank"><img height="60px" src="logo.png"></a>
+				<label for="toggle-1" class="toggle-menu">
+	          		<ul>
+			            <li></li>
+			            <li></li>
+			            <li></li>
+			        </ul>
+		        </label>
+				<input type="checkbox" id="toggle-1">
+				<nav>
+					<ul>
+						<li><a class="link" href="index.html">Home</a></li>
+						<li><a class="link" href="l-system.html">L-system</a></li>
+						<li><a href="#">About</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header>
 		<canvas id="theCanvas" data-processing-sources="./algorithmicbotany.pde"></canvas>
+		<footer>
+    	</footer>
 	</body>
 </html>

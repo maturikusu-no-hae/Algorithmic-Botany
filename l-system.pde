@@ -20,19 +20,13 @@ float len_ = 2; // Def: 2, change to 15 to see up closer.
 float angle_ = radians(25.7);
 int iterations = 7; // Def: 7, change to 3 so your computer won't burn.
 
-HScrollbar hs1;
-HScrollbar hs2;
-HScrollbar hs3;
-
 void setup()
 {
   size(800, 800);
 
   colorMode(HSB);
 
-  hs1 = new HScrollbar(0, 12, width, 16, 16, true);
-  hs2 = new HScrollbar(0, 38, width, 16, 16, true);
-  hs3 = new HScrollbar(0, 64, width, 16, 16, true);
+  setRules(rules);
 }
 
 void draw()
@@ -43,25 +37,34 @@ void draw()
   mouseY = clientY;
   mousePressed = pressedMouse;
 
-  hs1._update();
-  hs2._update();
-  hs3._update();
-
-  len_ = map(hs1.getPos(), 1.0, width, 1, 15);
-  angle_ = map(hs2.getPos(), 1.0, width, 0, PI / 2);
-  iterations = round(map(hs3.getPos(), 1.0, width, 1.0, 6.0));
+  len_ = map(getSliderValue("myRange1"), 1.0, 100.0, 1, 15);
+  angle_ = map(getSliderValue("myRange2"), 1.0, 100.0, 0, PI / 2);
+  iterations = round(map(getSliderValue("myRange3"), 1.0, 100.0, 1.0, 6.0));
 
   if(n <= iterations)
   {
+    if(newRules)
+    {
+      rules = new Rule[round(saved_array.length / 3)];
+      for(int i = 0; i < saved_array.length; i += 3)
+      {
+        rules[round(i / 3)] = new Rule(saved_array[i], saved_array[i + 1], round(saved_array[i + 2]));
+      }
+      newRules = false;
+    }
     background(150);
     n += 1;
     turtle.reset();
     generate();
     turtle.process_sentence();
   }
-  hs1.display();
-  hs2.display();
-  hs3.display();
+
+  if(updateTree)
+  {
+    sentence = new String(axiom);
+    n = 0;
+    updateTree = false;
+  }
 }
 
 void generate()
@@ -115,113 +118,6 @@ Rule pick_weighted_rule(char syl)
     }
   }
   return null;
-}
-
-/*
-Rule pick_weighted_rule(char syl)
-{
-  ArrayList<String[]> possibilities = new ArrayList<String[]>();
-  for(int i = 0; i < rules.length; i++)
-  {
-    if(syl != rules[i][0].charAt(0))
-    {
-      continue;
-    }
-    int amount = let2num(rules[i][2]);
-    for(int j = 0; j < amount; j++)
-    {
-      possibilities.add(rules[i]);
-    }
-  }
-  if(possibilities.size() == 0)
-  {
-    return null;
-  }
-  return possibilities.get(round(random(0, possibilities.size() - 1))); 
-}
-*/
-
-class HScrollbar {
-  int swidth, sheight;    // width and height of bar
-  float xpos, ypos;       // x and y position of bar
-  float spos, newspos;    // x position of slider
-  float sposMin, sposMax; // max and min values of slider
-  int loose;              // how loose/heavy
-  boolean over;           // is the mouse over the slider?
-  boolean locked;
-  float ratio;
-  boolean update;
-
-  HScrollbar (float xp, float yp, int sw, int sh, int l, boolean update) {
-    swidth = sw;
-    sheight = sh;
-    int widthtoheight = sw - sh;
-    ratio = (float)sw / (float)widthtoheight;
-    xpos = xp;
-    ypos = yp-sheight/2;
-    spos = xpos + swidth/2 - sheight/2;
-    newspos = spos;
-    sposMin = xpos;
-    sposMax = xpos + swidth - sheight;
-    loose = l;
-    this.update = update;
-  }
-
-  void _update() {
-    if (overEvent()) {
-      over = true;
-    } else {
-      over = false;
-    }
-    if (mousePressed && over) {
-      locked = true;
-    }
-    if (!mousePressed) {
-      locked = false;
-    }
-    if (locked) {
-      newspos = constrain(mouseX-sheight/2, sposMin, sposMax);
-    }
-    if (abs(newspos - spos) > 1) {
-      spos = spos + (newspos-spos)/loose;
-      if(this.update)
-      {
-        sentence = new String(axiom);
-        n = 0;
-      }
-    }
-  }
-
-  float constrain(float val, float minv, float maxv) {
-    return min(max(val, minv), maxv);
-  }
-
-  boolean overEvent() {
-    if (mouseX > xpos && mouseX < xpos+swidth &&
-       mouseY > ypos && mouseY < ypos+sheight) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  void display() {
-    noStroke();
-    fill(0.0, 0.0, 80.0);
-    rect(xpos, ypos, swidth, sheight);
-    if (over || locked) {
-      fill(0.0, 0.0, 0.0);
-    } else {
-      fill(0.0, 0.0, 40.0);
-    }
-    rect(spos, ypos, sheight, sheight);
-  }
-
-  float getPos() {
-    // Convert spos to be values between
-    // 0 and the total width of the scrollbar
-    return spos * ratio;
-  }
 }
 
 class Rule
